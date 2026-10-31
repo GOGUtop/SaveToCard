@@ -1,12 +1,12 @@
 {
-  "name": "Card 菜單診斷 (Vendetta v0.4)",
-  "description": "最小修復測試：檢查扳手設定、ActionSheet 偵測。僅顯示 Card 測試，不會上傳或讀取帳密。",
+  "name": "保存到 Card（一鍵保存 v1.7）",
+  "description": "一鍵操作：點擊後顯示正在保存，內部完成 Discord 原始 PNG 取得、SillyTavern 卡檢查及 CardVault 上傳，成功後顯示已保存到 Card。失敗不冒充成功。",
   "authors": [
     {
-      "name": "CardVault diagnostic"
+      "name": "CardVault integration"
     }
   ],
   "main": "index.js",
-  "version": "0.4.0",
-  "hash": "f31e5fe0ac4b560c2101d7bcc41744f78d89380ca92fe90c2fe8ecde9d4e79f9"
+  "version": "1.7.0",
+  "hash": "ad4394fc5871a93fe1fccfab66b0260048d37693"
 }
