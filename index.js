@@ -2,21 +2,21 @@
  * This file is embedded as a plain script in Revenge Classic (bunny, definePlugin).
  * Never reads Discord auth tokens or messages. Only uploads on explicit action.
  */
-var plugin = (function () {
+(function () {
   'use strict';
   var ID = 'cardvault.save-to-card';
   var TITLE = '保存到 Card';
   var DEFAULT_SERVER = 'http://aaa.xixisillytavern.top:8788';
   var MAX_SIZE = 30 * 1024 * 1024;
   var unpatches = [];
-  var reports = { patches: [], injected: 0, last: '尚未捕获图片菜单', error: '' };
+  var reports = { patches: [], injected: 0, api:'尚未启动', last: '尚未捕获图片菜单', error: '' };
   var config = { server: DEFAULT_SERVER, username: '', password: '', allowHttp: false, onlyCharacter: true };
   var store = null;
   var token = '';
   var busy = false;
 
-  function runtime() { return typeof bunny !== 'undefined' ? bunny : (typeof window !== 'undefined' ? window.bunny : null); }
-  function log(s) { try { console.log('[SaveToCard]', s); } catch (_) {} }
+  function runtime() { if (typeof vendetta !== 'undefined') return vendetta; if (typeof bunny !== 'undefined') return bunny; return null; }
+  function log(s) { try { var b=runtime(); if(b&&b.logger&&b.logger.log)b.logger.log('[SaveToCard] '+s); else console.log('[SaveToCard]', s); } catch (_) {} }
   function notify(s) {
     reports.last = String(s);
     log(s);
@@ -194,12 +194,12 @@ var plugin = (function () {
     scan(root,0);return flags;
   }
   function patchOne(name) {
-    var b=runtime(), metro=getMetro(), patcher=b&&b.api&&b.api.patcher;
+    var b=runtime(), metro=getMetro(), patcher=b&&(b.patcher || (b.api&&b.api.patcher));
     if (!metro||!patcher||typeof patcher.after!=='function') return false;
     var finder=metro.findByName || (metro.filters&&metro.filters.findByName);
     if (typeof finder!=='function') return false;
     var mod;
-    try { mod=finder(name,false); } catch (_) { return false; }
+    try { mod=finder(name,false); } catch (e) { reports.error='查找 '+name+' 出错: '+String(e);return false; }
     if (!mod||typeof mod.default!=='function') return false;
     var dispose=patcher.after('default',mod,function(args,tree){
       try {
@@ -220,7 +220,7 @@ var plugin = (function () {
   }
   function SettingsComponent() {
     var R=getReact(), RN=getRN();
-    if (!R||!RN||!RN.ScrollView||!RN.TextInput||!RN.Text) return null;
+    if (!R||!RN||!RN.ScrollView||!RN.TextInput||!RN.Text||!RN.Switch) return null;
     var h=R.createElement;
     var state=R.useState?R.useState(Object.assign({}, config)):[Object.assign({},config),function(){}];
     var values=state[0],setValues=state[1];
@@ -241,27 +241,27 @@ var plugin = (function () {
       h(RN.Switch,{value:!!values.allowHttp,onValueChange:function(v){change('allowHttp',v);}}),
       h(RN.Text,{style:label},'仅上传 chara / ccv3 角色卡 PNG'),
       h(RN.Switch,{value:!!values.onlyCharacter,onValueChange:function(v){change('onlyCharacter',v);}}),
-      h(RN.Text,{style:{color:'#b1c2dd',marginTop:20}},'已找到菜单补丁：'+(reports.patches.join(', ')||'无（需要适配 Discord 351.11）')),
+      h(RN.Text,{style:{color:'#b1c2dd',marginTop:20}},'运行环境：'+reports.api),
+      h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'已找到菜单补丁：'+(reports.patches.join(', ')||'无（需要适配 Discord 351.11）')),
       h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'菜单注入次数：'+reports.injected),
       h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'状态：'+reports.last),
       h(RN.Text,{style:{color:'#f6a0a0',marginTop:8}},reports.error)
     );
   }
   return {
-    start:function(){
+    onLoad:function(){
       try {
         var b=runtime();
-        if (b && b.plugin && typeof b.plugin.createStorage==='function') {
-          store=b.plugin.createStorage();
-          syncSettings();
-        }
+        if (b && b.plugin && b.plugin.storage) { store=b.plugin.storage;syncSettings(); }
+        reports.last='插件已执行 onLoad，正在查找图片菜单';
+        reports.api='metro='+!!getMetro()+', patcher='+!!(b&&b.patcher)+', storage='+!!store;
         var names=['MediaViewerActionSheet','MediaActionSheet','ImageActionSheet','MediaViewerContextMenu','AttachmentActionSheet','MediaOptionsActionSheet'];
         names.forEach(patchOne);
-        notify('SaveToCard 已启动；菜单适配点：'+reports.patches.length);
+        notify('SaveToCard 0.2 已启动；找到 '+reports.patches.length+' 个候选菜单模块');
       } catch (e) { reports.error=String(e);log(e); }
     },
-    stop:function(){unpatches.splice(0).forEach(function(f){try{f();}catch(_){}});token='';},
-    SettingsComponent:SettingsComponent,
+    onUnload:function(){unpatches.splice(0).forEach(function(f){try{f();}catch(_){}});token='';},
+    settings:SettingsComponent,
     __test:{sourceURL:sourceURL,pngHasCard:pngHasCard,findOriginalURL:findOriginalURL,insertBesideSave:insertBesideSave,upload:upload,config:config,reports:reports}
   };
-})();
+})()

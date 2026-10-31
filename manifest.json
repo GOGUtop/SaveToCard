@@ -1,12 +1,15 @@
 {
-  "name": "保存到 Card (Classic 测试版)",
-  "description": "在 Discord 图片菜单中增加保存到 Card 的实验性补丁；需实机验证 Discord 351.11 的菜单模块",
+  "name": "保存到 Card (Classic 诊断版 v0.2)",
+  "description": "修复 Revenge Classic 的插件 onLoad / settings 入口。PNG 菜单注入仍需实机验证。",
   "authors": [
     {
       "name": "CardVault integration"
     }
   ],
   "main": "index.js",
-  "version": "0.1.0",
-  "hash": "b7fbb6c09a17730de1278d910899d094efc83092c4104e5ac814139a63c0dde4"
+  "version": "0.2.0",
+  "hash": "b5741c6b1801f4f0e4103f29d8b30b730d2c136e7d90d1631015e54c3f4be39b",
+  "vendetta": {
+    "icon": "ic_download_24px"
+  }
 }
