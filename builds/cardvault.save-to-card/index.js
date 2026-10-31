@@ -9,7 +9,7 @@ var plugin = (function () {
   var DEFAULT_SERVER = 'http://aaa.xixisillytavern.top:8788';
   var MAX_SIZE = 30 * 1024 * 1024;
   var unpatches = [];
-  var reports = { patches: [], injected: 0, last: '尚未捕获图片菜单', error: '' };
+  var reports = { started: false, patches: [], injected: 0, last: '尚未捕获图片菜单', error: '' };
   var config = { server: DEFAULT_SERVER, username: '', password: '', allowHttp: false, onlyCharacter: true };
   var store = null;
   var token = '';
@@ -220,7 +220,7 @@ var plugin = (function () {
   }
   function SettingsComponent() {
     var R=getReact(), RN=getRN();
-    if (!R||!RN||!RN.ScrollView||!RN.TextInput||!RN.Text) return null;
+    if (!R||!RN||!RN.ScrollView||!RN.TextInput||!RN.Text||!RN.Switch) return null;
     var h=R.createElement;
     var state=R.useState?R.useState(Object.assign({}, config)):[Object.assign({},config),function(){}];
     var values=state[0],setValues=state[1];
@@ -231,7 +231,7 @@ var plugin = (function () {
     var label={color:'#d8d9ed',fontSize:14,marginTop:16,marginBottom:5};
     var input={color:'#ffffff',backgroundColor:'#414450',borderRadius:8,paddingHorizontal:12,paddingVertical:10};
     return h(RN.ScrollView,{style:{flex:1},contentContainerStyle:{padding:18,paddingBottom:50}},
-      h(RN.Text,{style:{color:'#f7f7fb',fontSize:19,fontWeight:'bold'}},'保存到 Card · Classic 测试版'),
+      h(RN.Text,{style:{color:'#f7f7fb',fontSize:19,fontWeight:'bold'}},'保存到 Card · Classic v0.3'),
       h(RN.Text,{style:{color:'#c6c8d3',marginTop:8}},'请只用你自己的 CardVault 凭据；不读取 Discord Token。'),
       ...fields.flatMap(function(f){return [
         h(RN.Text,{key:'l-'+f[0],style:label},f[1]),
@@ -241,7 +241,9 @@ var plugin = (function () {
       h(RN.Switch,{value:!!values.allowHttp,onValueChange:function(v){change('allowHttp',v);}}),
       h(RN.Text,{style:label},'仅上传 chara / ccv3 角色卡 PNG'),
       h(RN.Switch,{value:!!values.onlyCharacter,onValueChange:function(v){change('onlyCharacter',v);}}),
-      h(RN.Text,{style:{color:'#b1c2dd',marginTop:20}},'已找到菜单补丁：'+(reports.patches.join(', ')||'无（需要适配 Discord 351.11）')),
+      h(RN.Text,{style:{color:'#b1c2dd',marginTop:20}},'启动状态：'+(reports.started?'已执行 start()':'未启动')),
+      h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'运行接口：bunny='+!!runtime()+', metro='+!!getMetro()+', patcher='+!!(runtime()&&runtime().api&&runtime().api.patcher)+', storage='+!!store),
+      h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'已找到菜单补丁：'+(reports.patches.join(', ')||'无（需要适配 Discord 351.11）')),
       h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'菜单注入次数：'+reports.injected),
       h(RN.Text,{style:{color:'#b1c2dd',marginTop:8}},'状态：'+reports.last),
       h(RN.Text,{style:{color:'#f6a0a0',marginTop:8}},reports.error)
@@ -251,16 +253,18 @@ var plugin = (function () {
     start:function(){
       try {
         var b=runtime();
+        reports.started = true;
+        reports.last = '已执行 start()';
         if (b && b.plugin && typeof b.plugin.createStorage==='function') {
           store=b.plugin.createStorage();
           syncSettings();
         }
-        var names=['MediaViewerActionSheet','MediaActionSheet','ImageActionSheet','MediaViewerContextMenu','AttachmentActionSheet','MediaOptionsActionSheet'];
+        var names=['MediaViewerActionSheet','MediaActionSheet','ImageActionSheet','MediaViewerContextMenu','AttachmentActionSheet','MediaOptionsActionSheet','MediaViewerActions','MediaViewerOptions','MediaViewerMenu'];
         names.forEach(patchOne);
         notify('SaveToCard 已启动；菜单适配点：'+reports.patches.length);
       } catch (e) { reports.error=String(e);log(e); }
     },
-    stop:function(){unpatches.splice(0).forEach(function(f){try{f();}catch(_){}});token='';},
+    stop:function(){reports.started=false;unpatches.splice(0).forEach(function(f){try{f();}catch(_){}});token='';},
     SettingsComponent:SettingsComponent,
     __test:{sourceURL:sourceURL,pngHasCard:pngHasCard,findOriginalURL:findOriginalURL,insertBesideSave:insertBesideSave,upload:upload,config:config,reports:reports}
   };

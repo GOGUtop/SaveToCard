@@ -1,9 +1,9 @@
 {
   "$meta": {
     "name": "SaveToCard Classic",
-    "description": "CardVault role card media menu integration"
+    "description": "CardVault role card integration"
   },
   "cardvault.save-to-card": {
-    "version": "0.1.0"
+    "version": "0.3.0"
   }
 }

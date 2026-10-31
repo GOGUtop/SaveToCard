@@ -1,15 +1,12 @@
 {
-  "name": "保存到 Card (Classic 诊断版 v0.2)",
-  "description": "修复 Revenge Classic 的插件 onLoad / settings 入口。PNG 菜单注入仍需实机验证。",
+  "name": "保存到 Card (Classic v0.3 诊断版)",
+  "description": "已修正 0980cfc 的真实 Classic 插件导出格式；图片菜单模块仍需实机验证。",
   "authors": [
     {
       "name": "CardVault integration"
     }
   ],
   "main": "index.js",
-  "version": "0.2.0",
-  "hash": "b5741c6b1801f4f0e4103f29d8b30b730d2c136e7d90d1631015e54c3f4be39b",
-  "vendetta": {
-    "icon": "ic_download_24px"
-  }
+  "version": "0.3.0",
+  "hash": "f5782c3e0ac351000d7873be3dc7317ba3636027a3875dbc4fd9c688773c25a1"
 }
