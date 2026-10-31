@@ -1,0 +1,16 @@
+{
+  "id": "cardvault.save-to-card",
+  "spec": 3,
+  "version": "0.1.0",
+  "type": "plugin",
+  "display": {
+    "name": "保存到 Card (实验版)",
+    "description": "Discord 图片菜单上传角色卡到 CardVault。图片菜单补丁仍需 Discord 351.11 实机验证。",
+    "authors": [
+      {
+        "name": "CardVault integration"
+      }
+    ]
+  },
+  "main": "index.js"
+}

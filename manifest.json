@@ -1,0 +1,12 @@
+{
+  "name": "保存到 Card (Classic 测试版)",
+  "description": "在 Discord 图片菜单中增加保存到 Card 的实验性补丁；需实机验证 Discord 351.11 的菜单模块",
+  "authors": [
+    {
+      "name": "CardVault integration"
+    }
+  ],
+  "main": "index.js",
+  "version": "0.1.0",
+  "hash": "b7fbb6c09a17730de1278d910899d094efc83092c4104e5ac814139a63c0dde4"
+}
